@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
+#include "GASAbilitySystemComponent.h"
+#include <GameplayEffectTypes.h>
 #include "Logging/LogMacros.h"
 #include "GASCharacter.generated.h"
 
@@ -16,7 +19,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class AGASCharacter : public ACharacter
+class AGASCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -27,7 +30,7 @@ class AGASCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
-	
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -44,9 +47,32 @@ class AGASCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Ability System */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
+	class UGASAbilitySystemComponent* AbilitySystemComponent;
+
+	/** Attributes */
+	UPROPERTY()
+	class UGASAttributeSet* Attributes;
+
 public:
 	AGASCharacter();
 	
+	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	virtual void InitializeAttributes();
+	virtual void GiveAbilities();
+
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+	/**Effect that initializes default attributes. */
+	UPROPERTY(BlueprintReadonly, EditDefaultsOnly, Category = "GAS")
+	TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
+
+	/**Gameplay abilities. */
+	UPROPERTY(BlueprintReadonly, EditDefaultsOnly, Category = "GAS")
+	TArray<TSubclassOf<class UGASGameplayAbility>> DefaultAbilities;
 
 protected:
 

@@ -7,7 +7,10 @@
 		{
 			"Name": "GAS",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"GameplayAbilities"
+			]
 		}
 	],
 	"Plugins": [
@@ -20,7 +23,7 @@
 		},
 		{
 			"Name": "GameplayAbilities",
-			"Enabled":  true
+			"Enabled": true
 		}
 	]
 }
